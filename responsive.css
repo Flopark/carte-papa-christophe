@@ -54,6 +54,56 @@ html {
 .lightbox { max-height: calc(100dvh - 24px); }
 .lightbox img { max-height: calc(100dvh - 140px); }
 
+.hero-photo-button {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: transparent;
+  cursor: zoom-in;
+  touch-action: manipulation;
+}
+.window-content .hero-photo-button { height: 100%; }
+.garden-photo .hero-photo-button { aspect-ratio: 4 / 5; }
+.hero-photo-button img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.garden-photo .hero-photo-button img { position: absolute; inset: 0; }
+.hero-photo-button:focus-visible { outline: 3px solid white; outline-offset: -5px; }
+.photo-img-wrap { position: relative; }
+.photo-img-wrap img { object-position: var(--photo-position, 50% 50%) !important; }
+.photo-img-wrap img.is-rotated {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 125%;
+  height: 80%;
+  transform: translate(-50%, -50%) rotate(var(--rotation));
+}
+.lightbox-stage {
+  position: relative;
+  width: min(85vw, calc((100dvh - 170px) * var(--photo-ratio, 1)));
+  max-width: 100%;
+  aspect-ratio: var(--photo-ratio, 1);
+}
+.lightbox .lightbox-stage img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  object-fit: contain;
+  transform: translate(-50%, -50%) rotate(var(--rotation, 0deg));
+}
+.lightbox .lightbox-stage.is-rotated img {
+  width: calc(100% / var(--photo-ratio));
+  height: calc(100% * var(--photo-ratio));
+}
+
 .hero-copy,
 .garden-hero-copy,
 .boarding-main {
@@ -61,6 +111,8 @@ html {
 }
 
 @media (max-width: 600px) {
+  .photo-img-wrap img { object-position: var(--mobile-photo-position, 50% 50%) !important; }
+  .photo-img-wrap img.is-rotated { width: 80%; height: 125%; }
   .topbar {
     padding: 12px 5%;
     gap: 12px;

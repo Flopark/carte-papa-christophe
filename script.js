@@ -9,6 +9,7 @@
   const gallery = document.getElementById('gallery');
   const lightbox = document.getElementById('lightbox');
   const lightboxImage = document.getElementById('lightbox-image');
+  const lightboxStage = document.getElementById('lightbox-stage');
   const lightboxCaption = document.getElementById('lightbox-caption');
   let previousFocus;
 
@@ -16,6 +17,10 @@
     lightboxImage.src = photo.src;
     lightboxImage.alt = photo.alt || 'Chrystelle et Christophe ensemble';
     lightboxCaption.textContent = photo.caption || '';
+    const rotated = Math.abs(photo.rotation || 0) === 90;
+    lightboxStage.classList.toggle('is-rotated', rotated);
+    lightboxStage.style.setProperty('--rotation', (photo.rotation || 0) + 'deg');
+    lightboxStage.style.setProperty('--photo-ratio', rotated ? photo.height / photo.width : photo.width / photo.height);
     previousFocus = trigger;
     lightbox.showModal();
     document.body.style.overflow = 'hidden';
@@ -28,7 +33,7 @@
   if (validPhotos.length) {
     gallery.replaceChildren();
     document.getElementById('preview-note').hidden = true;
-    validPhotos.forEach((photo, index) => {
+    validPhotos.filter(photo => photo.gallery !== false).forEach((photo, index) => {
       const figure = document.createElement('figure');
       figure.className = 'photo-card';
       figure.style.setProperty('--tilt', [-3, 2, -2][index % 3] + 'deg');
@@ -39,6 +44,10 @@
       const img = document.createElement('img');
       img.src = photo.src; img.alt = photo.alt || 'Chrystelle et Christophe ensemble';
       img.loading = 'lazy'; img.decoding = 'async'; img.style.objectPosition = photo.position || '50% 50%';
+      img.width = photo.width; img.height = photo.height;
+      img.style.setProperty('--photo-position', photo.position || '50% 50%');
+      img.style.setProperty('--mobile-photo-position', photo.mobilePosition || photo.position || '50% 50%');
+      if (photo.rotation) { img.classList.add('is-rotated'); img.style.setProperty('--rotation', photo.rotation + 'deg'); }
       img.addEventListener('error', () => { figure.hidden = true; });
       const caption = document.createElement('figcaption'); caption.textContent = photo.caption || '';
       wrap.append(img); button.append(wrap); figure.append(button, caption); gallery.append(figure);
@@ -46,14 +55,19 @@
     });
     const main = validPhotos.find(photo => photo.hero) || validPhotos[0];
     const hero = document.getElementById('hero-photo');
+    const heroButton = document.createElement('button');
+    heroButton.className = 'hero-photo-button'; heroButton.type = 'button';
+    heroButton.setAttribute('aria-label', 'Agrandir la photo principale');
+    heroButton.addEventListener('click', () => openPhoto(main, heroButton));
     const img = document.createElement('img'); img.alt = main.alt || 'Chrystelle et Christophe ensemble';
     img.src = main.src; img.fetchPriority = 'high'; img.style.objectPosition = main.position || '50% 50%';
+    img.width = main.width; img.height = main.height;
+    heroButton.append(img);
     img.addEventListener('error', () => { img.remove(); }, { once: true });
     img.addEventListener('load', () => {
-      if (theme === 'papa') hero.replaceChildren(img);
-      else { const placeholder = hero.querySelector('.garden-photo-placeholder'); if (placeholder) placeholder.replaceWith(img); }
+      if (theme === 'papa') hero.replaceChildren(heroButton);
+      else { const placeholder = hero.querySelector('.garden-photo-placeholder'); if (placeholder) placeholder.replaceWith(heroButton); }
     }, { once: true });
-    if (theme === 'papa') hero.append(img);
   }
 
   const trigger = document.querySelector('.surprise-button');
