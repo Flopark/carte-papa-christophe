@@ -16,7 +16,8 @@
   function openPhoto(photo, trigger) {
     lightboxImage.src = photo.src;
     lightboxImage.alt = photo.alt || 'Chrystelle et Christophe ensemble';
-    lightboxCaption.textContent = photo.caption || '';
+    lightboxCaption.textContent = photo.gallery === false ? (photo.caption || '') : '';
+    lightboxCaption.hidden = !lightboxCaption.textContent;
     const rotated = Math.abs(photo.rotation || 0) === 90;
     lightboxStage.classList.toggle('is-rotated', rotated);
     lightboxStage.style.setProperty('--rotation', (photo.rotation || 0) + 'deg');
@@ -39,7 +40,7 @@
       figure.style.setProperty('--tilt', [-3, 2, -2][index % 3] + 'deg');
       const button = document.createElement('button');
       button.type = 'button'; button.className = 'photo-button';
-      button.setAttribute('aria-label', 'Agrandir la photo : ' + (photo.caption || 'souvenir ' + (index + 1)));
+      button.setAttribute('aria-label', 'Agrandir la photo ' + (index + 1));
       const wrap = document.createElement('div'); wrap.className = 'photo-img-wrap';
       const img = document.createElement('img');
       img.src = photo.src; img.alt = photo.alt || 'Chrystelle et Christophe ensemble';
@@ -49,8 +50,7 @@
       img.style.setProperty('--mobile-photo-position', photo.mobilePosition || photo.position || '50% 50%');
       if (photo.rotation) { img.classList.add('is-rotated'); img.style.setProperty('--rotation', photo.rotation + 'deg'); }
       img.addEventListener('error', () => { figure.hidden = true; });
-      const caption = document.createElement('figcaption'); caption.textContent = photo.caption || '';
-      wrap.append(img); button.append(wrap); figure.append(button, caption); gallery.append(figure);
+      wrap.append(img); button.append(wrap); figure.append(button); gallery.append(figure);
       button.addEventListener('click', () => openPhoto(photo, button));
     });
     const main = validPhotos.find(photo => photo.hero) || validPhotos[0];
